@@ -123,7 +123,7 @@ When ClipRide connects to an unrecognized camera model, it displays a warning al
 
 ### From APK (Sideload)
 
-1. Download the latest APK from [Releases](../../releases)
+1. Download the latest APK from [Releases](https://github.com/yrkan/clipride/releases)
 2. Transfer to your Karoo via the Hammerhead Companion App, or install directly:
    ```bash
    adb install clipride.apk
@@ -152,7 +152,7 @@ cd ..
 ./gradlew assembleDebug
 ```
 
-The debug APK will be at `app/build/outputs/apk/debug/app-debug.apk`.
+The debug APK will be at `app/build/outputs/apk/debug/clipride.apk`.
 
 For a release build with ProGuard minification:
 ```bash
@@ -161,7 +161,7 @@ For a release build with ProGuard minification:
 
 Install on a connected Karoo:
 ```bash
-adb install app/build/outputs/apk/debug/app-debug.apk
+adb install app/build/outputs/apk/debug/clipride.apk
 ```
 
 ## First-Time Setup

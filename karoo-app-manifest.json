@@ -1,0 +1,12 @@
+{
+  "label": "ClipRide",
+  "packageName": "com.clipride",
+  "latestApkUrl": "https://github.com/yrkan/clipride/releases/latest/download/clipride.apk",
+  "latestVersion": "1.0.1",
+  "latestVersionCode": 2,
+  "iconUrl": "https://raw.githubusercontent.com/yrkan/clipride/main/assets/icon.png",
+  "developer": "Yuri Kan",
+  "description": "GoPro camera control for Karoo via Bluetooth Low Energy. Auto-record with ride lifecycle, auto-highlights on lap/power/speed, 4 live data fields (battery, recording, camera status, power), in-ride alerts, auto-reconnect. No phone needed.",
+  "releaseNotes": "v1.0.1: Initial public release. BLE connection, auto-record, auto-highlights, 4 data fields, battery/SD alerts, auto-pairing for Karoo 3.",
+  "screenshotUrls": []
+}
