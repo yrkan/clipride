@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ClipRide</string>
+    <string name="extension_name">ClipRide</string>
+
+    <!-- BonusActions -->
+    <string name="action_toggle_rec">Record</string>
+    <string name="action_highlight">Highlight</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- DataTypes -->
+    <string name="dt_battery">Battery</string>
+    <string name="dt_battery_desc">Camera battery level</string>
+    <string name="dt_recording">Recording</string>
+    <string name="dt_recording_desc">Camera recording timer</string>
+    <string name="dt_status">Status</string>
+    <string name="dt_status_desc">Camera combined status</string>
+    <string name="dt_power">Power</string>
+    <string name="dt_power_desc">Turn camera on/off</string>
+
+    <!-- Settings: categories -->
+    <string name="pref_cat_camera">Camera</string>
+    <string name="pref_cat_recording">Recording</string>
+    <string name="pref_cat_auto_record">Auto-Record</string>
+    <string name="pref_cat_highlights">Highlights</string>
+    <string name="pref_cat_alerts">Alerts</string>
+    <string name="pref_cat_advanced">Advanced</string>
+
+    <!-- Settings: camera -->
+    <string name="pref_camera_info">Camera</string>
+    <string name="pref_no_camera">No camera connected</string>
+    <string name="pref_pair_camera">Connect Camera</string>
+    <string name="pref_pair_camera_desc">Scan and connect camera</string>
+    <string name="pref_forget_camera">Forget Camera</string>
+    <string name="pref_forget_camera_desc">Remove saved camera</string>
+    <string name="pref_forget_confirm_title">Forget camera?</string>
+    <string name="pref_forget_confirm_msg">Saved camera will be removed</string>
+
+    <!-- Settings: status -->
+    <string name="settings_connect">Connect</string>
+    <string name="settings_reconnect">Reconnect</string>
+    <string name="settings_disconnect">Disconnect</string>
+    <string name="settings_turn_off">Turn Off</string>
+    <string name="settings_forget">Forget</string>
+    <string name="settings_connect_camera">Connect Camera</string>
+    <string name="status_connected">Connected</string>
+    <string name="status_connecting">Connecting\u2026</string>
+    <string name="status_scanning">Scanning\u2026</string>
+    <string name="status_pairing">Pairing\u2026</string>
+    <string name="status_disconnected">Disconnected</string>
+
+    <!-- Settings: picker values -->
+    <string name="settings_none">None</string>
+    <string name="delay_5s">5s</string>
+    <string name="delay_10s">10s</string>
+    <string name="delay_15s">15s</string>
+
+    <!-- Settings: auto-record -->
+    <string name="pref_auto_record">Auto-Record</string>
+    <string name="pref_auto_record_desc">Start/stop recording with ride</string>
+    <string name="pref_auto_record_delay">Start Delay</string>
+    <string name="pref_stop_delay">Stop Delay</string>
+    <string name="pref_continue_auto_pause">Continue on Auto-Pause</string>
+    <string name="pref_continue_auto_pause_desc">Keep recording at traffic lights</string>
+
+    <!-- Settings: highlights -->
+    <string name="pref_highlight_lap">Lap Highlight</string>
+    <string name="pref_highlight_lap_desc">Add highlight on lap button press</string>
+    <string name="pref_highlight_power">Power Highlight</string>
+    <string name="pref_highlight_power_desc">Add highlight on peak power</string>
+    <string name="pref_power_threshold">Power Threshold</string>
+    <string name="pref_highlight_speed">Speed Highlight</string>
+    <string name="pref_highlight_speed_desc">Add highlight on max speed</string>
+    <string name="pref_speed_threshold">Speed Threshold</string>
+    <string name="pref_auto_highlights">Auto-Highlights</string>
+
+    <!-- Settings: alerts -->
+    <string name="pref_battery_low">Low Battery</string>
+    <string name="pref_battery_critical">Critical Battery</string>
+    <string name="pref_battery_alert">Low Battery Alert</string>
+    <string name="pref_battery_threshold">Threshold</string>
+
+    <!-- Pairing -->
+    <string name="pairing_title">Find Camera</string>
+    <string name="pairing_scanning">Scanning for cameras\u2026</string>
+    <string name="pairing_no_devices">No cameras found. Make sure camera is turned on</string>
+    <string name="pairing_connecting">Connecting\u2026</string>
+    <string name="pairing_success">Camera connected!</string>
+    <string name="pairing_failed">Failed to connect camera</string>
+    <string name="pairing_scan">Scan</string>
+    <string name="pairing_cancel">Cancel</string>
+    <string name="pairing_connected">Connected!</string>
+    <string name="pairing_retry">Retry</string>
+    <string name="pairing_permission_needed">Bluetooth permission is required to find cameras</string>
+    <string name="pairing_searching">Searching\u2026</string>
+    <string name="pairing_scan_again">Scan Again</string>
+    <string name="pairing_associating">Associating\u2026</string>
+    <string name="pairing_setup_required">Setup Required</string>
+    <string name="pairing_notification_instructions">To pair with %s, enable\nNotification Access for ClipRide:</string>
+    <string name="pairing_open_notification_access">Open Notification Access</string>
+    <string name="pairing_enable_then_connect">Enable ClipRide, then tap Connect</string>
+    <string name="pairing_connect">Connect</string>
+    <string name="pairing_try_again">Try Again</string>
+    <string name="pairing_bt_permission_required">Bluetooth permission required</string>
+
+    <!-- Recording DataType -->
+    <string name="rec_tap_start">tap to start</string>
+    <string name="rec_tap_stop">tap to stop</string>
+    <string name="rec_label">REC</string>
+    <string name="idle_label">IDLE</string>
+    <string name="sd_label">SD:</string>
+    <string name="no_data_placeholder">\u2014\u2014\u2014</string>
+
+    <!-- Legal -->
+    <string name="trademark_disclaimer">This product is not affiliated with, endorsed by, or in any way associated with GoPro, Inc. GoPro\u00AE, HERO\u00AE, and their respective logos are trademarks or registered trademarks of GoPro, Inc.</string>
+
+    <!-- Settings: reset -->
+    <string name="pref_reset">Reset All Settings</string>
+    <string name="pref_reset_confirm_title">Reset settings?</string>
+    <string name="pref_reset_confirm_msg">All settings will be restored to defaults. Camera pairing will be kept.</string>
+
+    <!-- Common -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="yes">Yes</string>
+
+    <!-- Delay entries -->
+    <string-array name="delay_entries">
+        <item>No delay</item>
+        <item>5 seconds</item>
+        <item>10 seconds</item>
+        <item>15 seconds</item>
+    </string-array>
+    <string-array name="delay_values">
+        <item>0</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+    </string-array>
+
+    <!-- Battery low threshold entries -->
+    <string-array name="battery_low_entries">
+        <item>15%</item>
+        <item>20%</item>
+        <item>25%</item>
+        <item>30%</item>
+    </string-array>
+    <string-array name="battery_low_values">
+        <item>15</item>
+        <item>20</item>
+        <item>25</item>
+        <item>30</item>
+    </string-array>
+
+    <!-- Battery critical threshold entries -->
+    <string-array name="battery_critical_entries">
+        <item>5%</item>
+        <item>10%</item>
+        <item>15%</item>
+    </string-array>
+    <string-array name="battery_critical_values">
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+    </string-array>
+</resources>

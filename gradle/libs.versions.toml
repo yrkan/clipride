@@ -1,0 +1,38 @@
+[versions]
+agp = "8.6.1"
+kotlin = "2.0.0"
+hilt = "2.52"
+ksp = "2.0.0-1.0.23"
+coroutines = "1.8.0"
+coreKtx = "1.13.1"
+lifecycle = "2.8.6"
+nordicBle = "2.0.0-alpha02"
+karooExt = "1.1.8"
+protobuf = "4.28.2"
+protobufPlugin = "0.9.4"
+timber = "5.0.1"
+glance = "1.1.1"
+composeBom = "2024.06.00"
+activityCompose = "1.9.1"
+
+[libraries]
+androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }
+androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
+androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "lifecycle" }
+kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
+hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hilt" }
+nordic-ble-client = { module = "no.nordicsemi.kotlin.ble:client-android", version.ref = "nordicBle" }
+karoo-ext = { module = "io.hammerhead:karoo-ext", version.ref = "karooExt" }
+protobuf-javalite = { module = "com.google.protobuf:protobuf-javalite", version.ref = "protobuf" }
+timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
+androidx-glance-appwidget = { module = "androidx.glance:glance-appwidget", version.ref = "glance" }
+androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+google-dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+google-devtools-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+jetbrains-kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+google-protobuf = { id = "com.google.protobuf", version.ref = "protobufPlugin" }

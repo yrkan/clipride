@@ -1,0 +1,48 @@
+# Build
+build/
+*.apk
+*.aar
+*.aab
+*.ap_
+
+# Gradle
+.gradle/
+.kotlin/
+local.properties
+
+# IDE
+.idea/
+*.iml
+
+# Signing
+*.jks
+*.keystore
+secrets.properties
+*.pem
+*.p12
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dev tools
+.claude/
+CLAUDE.md
+.mcp.json
+
+# Analysis & study files
+STUDY_PLAN.md
+PHASE*.md
+*_ANALYSIS*.md
+*_REFERENCE*.md
+*_SPEC*.md
+clipride.md
+
+# Landing page (separate project)
+clipride-landing/
+
+# Reference repos (not part of the app)
+OpenGoPro-main/
+ki2-main/
+karoo-ext-master/
+Kotlin-BLE-Library-version-2.0/

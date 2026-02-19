@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ExtensionInfo
+    displayName="@string/extension_name"
+    icon="@drawable/ic_clipride"
+    id="clipride"
+    scansDevices="true"
+    configurable="true">
+
+    <DataType
+        typeId="gopro-battery"
+        displayName="@string/dt_battery"
+        description="@string/dt_battery_desc"
+        graphical="false"
+        icon="@drawable/ic_clipride" />
+
+    <DataType
+        typeId="gopro-recording"
+        displayName="@string/dt_recording"
+        description="@string/dt_recording_desc"
+        graphical="true"
+        icon="@drawable/ic_clipride" />
+
+    <DataType
+        typeId="gopro-status"
+        displayName="@string/dt_status"
+        description="@string/dt_status_desc"
+        graphical="true"
+        icon="@drawable/ic_clipride" />
+
+    <DataType
+        typeId="gopro-power"
+        displayName="@string/dt_power"
+        description="@string/dt_power_desc"
+        graphical="true"
+        icon="@drawable/ic_clipride" />
+
+    <BonusAction
+        displayName="@string/action_toggle_rec"
+        actionId="toggle-recording" />
+
+    <BonusAction
+        displayName="@string/action_highlight"
+        actionId="add-highlight" />
+
+    <BonusAction
+        displayName="@string/action_settings"
+        actionId="open-settings" />
+</ExtensionInfo>

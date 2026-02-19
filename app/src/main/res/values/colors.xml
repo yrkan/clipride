@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Background -->
+    <color name="background">#FF000000</color>
+    <color name="surface_dark">#FF111111</color>
+    <color name="surface_variant">#FF1A1A1A</color>
+
+    <!-- Primary -->
+    <color name="primary_blue">#FF2196F3</color>
+    <color name="primary_blue_dark">#FF1976D2</color>
+
+    <!-- Status -->
+    <color name="status_connected">#FF4CAF50</color>
+    <color name="status_connecting">#FFFFC107</color>
+    <color name="status_disconnected">#FF757575</color>
+    <color name="status_error">#FFF44336</color>
+    <color name="recording_red">#FFF44336</color>
+
+    <!-- Battery -->
+    <color name="battery_good">#FF4CAF50</color>
+    <color name="battery_low">#FFFFC107</color>
+    <color name="battery_critical">#FFF44336</color>
+
+    <!-- Text -->
+    <color name="white">#FFFFFFFF</color>
+    <color name="text_secondary">#FFAAAAAA</color>
+    <color name="text_dim">#FF666666</color>
+
+    <!-- Dividers & Borders -->
+    <color name="divider">#FF222222</color>
+    <color name="frame_border">#FF333333</color>
+
+    <!-- Alerts (for InRideAlert @ColorRes) -->
+    <color name="alert_warning">#FFFFC107</color>
+    <color name="alert_critical">#FFF44336</color>
+</resources>
