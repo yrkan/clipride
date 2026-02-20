@@ -64,14 +64,38 @@ class CameraStatusDataType(
         }
 
         val job = CoroutineScope(Dispatchers.IO).launch {
+            // Render initial state immediately so view is not blank on screen return
+            try {
+                val initialState = CameraState(
+                    bleManager.connectionState.value,
+                    bleManager.isRecording.value,
+                    bleManager.displayDuration.value,
+                    bleManager.batteryLevel.value,
+                    bleManager.sdCardRemaining.value,
+                    bleManager.activeHilights.value,
+                )
+                val result = glance.compose(context, DpSize.Unspecified) {
+                    CameraStatusView(initialState, tier, toggleIntent)
+                }
+                emitter.updateView(result.remoteViews)
+            } catch (e: Exception) {
+                Timber.w(e, "CameraStatusDataType: initial render failed")
+            }
+
+            // combine() supports max 5 flows — nest with another combine
             combine(
-                bleManager.connectionState,
-                bleManager.isRecording,
-                bleManager.displayDuration,
-                bleManager.batteryLevel,
-                bleManager.sdCardRemaining,
-            ) { state, recording, duration, battery, sd ->
-                CameraState(state, recording, duration, battery, sd)
+                combine(
+                    bleManager.connectionState,
+                    bleManager.isRecording,
+                    bleManager.displayDuration,
+                ) { state, recording, duration -> Triple(state, recording, duration) },
+                combine(
+                    bleManager.batteryLevel,
+                    bleManager.sdCardRemaining,
+                    bleManager.activeHilights,
+                ) { battery, sd, hilights -> Triple(battery, sd, hilights) },
+            ) { (state, recording, duration), (battery, sd, hilights) ->
+                CameraState(state, recording, duration, battery, sd, hilights)
             }.conflate().collect { state ->
                 try {
                     val result = glance.compose(context, DpSize.Unspecified) {
@@ -95,6 +119,7 @@ private data class CameraState(
     val recordingDuration: Int,
     val batteryLevel: Int?,
     val sdCardRemaining: Int?,
+    val activeHilights: Int = 0,
 )
 
 @Composable
@@ -144,11 +169,25 @@ private fun FullLayout(state: CameraState, tapAction: androidx.glance.action.Act
                 ),
             )
         }
-        ValueText(
-            text = "${state.batteryLevel ?: "--"}%",
-            fontSize = 16.sp,
-            color = batColor,
-        )
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = "${state.batteryLevel ?: "--"}%",
+                style = TextStyle(
+                    color = ColorProvider(batColor),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Bold,
+                ),
+            )
+            if (state.isRecording && state.activeHilights > 0) {
+                Text(
+                    text = "  HiLite: ${state.activeHilights}",
+                    style = TextStyle(
+                        color = ColorProvider(GlanceColors.TextSecondary),
+                        fontSize = 14.sp,
+                    ),
+                )
+            }
+        }
         LabelText(
             text = "SD: ${formatSdRemaining(state.sdCardRemaining)}",
             color = GlanceColors.TextPrimary,
@@ -174,6 +213,15 @@ private fun HalfLayout(state: CameraState, tapAction: androidx.glance.action.Act
                     fontSize = 16.sp,
                 ),
             )
+            if (state.isRecording && state.activeHilights > 0) {
+                Text(
+                    text = " H:${state.activeHilights}",
+                    style = TextStyle(
+                        color = ColorProvider(GlanceColors.TextSecondary),
+                        fontSize = 14.sp,
+                    ),
+                )
+            }
         }
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(

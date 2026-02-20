@@ -20,6 +20,7 @@ import com.clipride.karoo.ClipRideActionReceiver
 import com.clipride.karoo.datatypes.glance.DataFieldContainer
 import com.clipride.karoo.datatypes.glance.GlanceColors
 import com.clipride.karoo.datatypes.glance.LabelText
+import com.clipride.karoo.datatypes.glance.NoDataText
 import com.clipride.karoo.datatypes.glance.ValueText
 import io.hammerhead.karooext.extension.DataTypeImpl
 import io.hammerhead.karooext.internal.ViewEmitter
@@ -31,39 +32,39 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 
 @OptIn(ExperimentalGlanceRemoteViewsApi::class)
-class PowerDataType(
+class PhotoDataType(
     extension: String,
     private val bleManager: GoProBleManager,
-) : DataTypeImpl(extension, "gopro-power") {
+) : DataTypeImpl(extension, "gopro-photo") {
 
     private val glance = GlanceRemoteViews()
 
     override fun startView(context: Context, config: ViewConfig, emitter: ViewEmitter) {
         emitter.onNext(UpdateGraphicConfig(showHeader = true))
 
-        val toggleIntent = Intent(ClipRideActionReceiver.ACTION_TOGGLE_POWER).apply {
+        val photoIntent = Intent(ClipRideActionReceiver.ACTION_TAKE_PHOTO).apply {
             component = ComponentName("com.clipride", "com.clipride.karoo.ClipRideActionReceiver")
         }
 
         val job = CoroutineScope(Dispatchers.IO).launch {
-            // Render initial state immediately so view is not blank on screen return
+            // Render initial state
             try {
                 val result = glance.compose(context, DpSize.Unspecified) {
-                    PowerView(bleManager.connectionState.value, toggleIntent)
+                    PhotoView(bleManager.connectionState.value, photoIntent)
                 }
                 emitter.updateView(result.remoteViews)
             } catch (e: Exception) {
-                Timber.w(e, "PowerDataType: initial render failed")
+                Timber.w(e, "PhotoDataType: initial render failed")
             }
 
             bleManager.connectionState.collect { state ->
                 try {
                     val result = glance.compose(context, DpSize.Unspecified) {
-                        PowerView(state, toggleIntent)
+                        PhotoView(state, photoIntent)
                     }
                     emitter.updateView(result.remoteViews)
                 } catch (e: Exception) {
-                    Timber.w(e, "PowerDataType: render failed")
+                    Timber.w(e, "PhotoDataType: render failed")
                 }
             }
         }
@@ -72,48 +73,31 @@ class PowerDataType(
 }
 
 @Composable
-private fun PowerView(
+private fun PhotoView(
     state: GoProConnectionState,
-    toggleIntent: Intent,
+    photoIntent: Intent,
 ) {
     DataFieldContainer {
         Column(
             modifier = GlanceModifier
                 .fillMaxSize()
-                .clickable(actionSendBroadcast(toggleIntent)),
+                .clickable(actionSendBroadcast(photoIntent)),
             verticalAlignment = Alignment.CenterVertically,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            when (state) {
-                GoProConnectionState.CONNECTED -> {
-                    ValueText(
-                        text = "ON",
-                        fontSize = 32.sp,
-                        color = GlanceColors.BatteryGood,
-                    )
-                }
-
-                GoProConnectionState.SCANNING,
-                GoProConnectionState.CONNECTING,
-                GoProConnectionState.PAIRING -> {
-                    ValueText(
-                        text = when (state) {
-                            GoProConnectionState.SCANNING -> "SCAN"
-                            GoProConnectionState.PAIRING -> "PAIR"
-                            else -> "WAIT"
-                        },
-                        fontSize = 28.sp,
-                        color = GlanceColors.BatteryLow,
-                    )
-                }
-
-                GoProConnectionState.DISCONNECTED -> {
-                    ValueText(
-                        text = "OFF",
-                        fontSize = 32.sp,
-                        color = GlanceColors.TextDim,
-                    )
-                }
+            if (state != GoProConnectionState.CONNECTED) {
+                NoDataText()
+            } else {
+                ValueText(
+                    text = "PHOTO",
+                    fontSize = 28.sp,
+                    color = GlanceColors.BatteryGood,
+                )
+                LabelText(
+                    text = "tap for photo",
+                    color = GlanceColors.TextDim,
+                    fontSize = 11.sp,
+                )
             }
         }
     }

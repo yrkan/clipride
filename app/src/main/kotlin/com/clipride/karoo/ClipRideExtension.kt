@@ -6,6 +6,8 @@ import com.clipride.ble.GoProBleManager
 import com.clipride.ble.GoProCommands
 import com.clipride.karoo.datatypes.BatteryDataType
 import com.clipride.karoo.datatypes.CameraStatusDataType
+import com.clipride.karoo.datatypes.ModeDataType
+import com.clipride.karoo.datatypes.PhotoDataType
 import com.clipride.karoo.datatypes.PowerDataType
 import com.clipride.karoo.datatypes.RecordingDataType
 import com.clipride.karoo.handlers.AutoRecordHandler
@@ -23,7 +25,9 @@ import io.hammerhead.karooext.models.RequestBluetooth
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import com.clipride.ble.GoProConnectionState
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -47,6 +51,8 @@ class ClipRideExtension : KarooExtension("clipride", BuildConfig.VERSION_NAME) {
             RecordingDataType(extension, bleManager),
             CameraStatusDataType(extension, bleManager),
             PowerDataType(extension, bleManager),
+            ModeDataType(extension, bleManager),
+            PhotoDataType(extension, bleManager),
         )
     }
 
@@ -78,8 +84,25 @@ class ClipRideExtension : KarooExtension("clipride", BuildConfig.VERSION_NAME) {
         handlersStarted = true
         Timber.d("Starting ride handlers")
         AutoRecordHandler(serviceScope, karooSystem, bleManager, commands, preferences).start()
-        BatteryAlertHandler(serviceScope, karooSystem, bleManager, preferences).start()
+        BatteryAlertHandler(serviceScope, karooSystem, bleManager, commands, preferences).start()
         HighlightEventHandler(serviceScope, karooSystem, bleManager, commands, preferences).start()
+        startVideoSettingsApplier()
+    }
+
+    private fun startVideoSettingsApplier() {
+        bleManager.connectionState
+            .filter { it == GoProConnectionState.CONNECTED }
+            .onEach {
+                Timber.d("Camera connected, applying video settings")
+                commands.applyVideoSettings(
+                    resolution = preferences.videoResolution,
+                    fps = preferences.videoFps,
+                    fov = preferences.videoFov,
+                    hyperSmooth = preferences.videoHyperSmooth,
+                )
+            }
+            .catch { e -> Timber.w(e, "Video settings applier error") }
+            .launchIn(serviceScope)
     }
 
     override fun startScan(emitter: Emitter<Device>) {

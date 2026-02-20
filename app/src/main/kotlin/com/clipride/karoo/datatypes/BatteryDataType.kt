@@ -40,6 +40,16 @@ class BatteryDataType(
         emitter.onNext(UpdateGraphicConfig(showHeader = true))
 
         val job = CoroutineScope(Dispatchers.IO).launch {
+            // Render initial state immediately so view is not blank on screen return
+            try {
+                val result = glance.compose(context, DpSize.Unspecified) {
+                    BatteryView(bleManager.connectionState.value, bleManager.batteryLevel.value)
+                }
+                emitter.updateView(result.remoteViews)
+            } catch (e: Exception) {
+                Timber.w(e, "BatteryDataType: initial render failed")
+            }
+
             combine(
                 bleManager.connectionState,
                 bleManager.batteryLevel,

@@ -17,6 +17,10 @@
     <string name="dt_status_desc">Camera combined status</string>
     <string name="dt_power">Power</string>
     <string name="dt_power_desc">Turn camera on/off</string>
+    <string name="dt_mode">Mode</string>
+    <string name="dt_mode_desc">Camera mode: Video/Photo/Timelapse</string>
+    <string name="dt_photo">Photo</string>
+    <string name="dt_photo_desc">Quick photo capture</string>
 
     <!-- Settings: categories -->
     <string name="pref_cat_camera">Camera</string>
@@ -73,6 +77,23 @@
     <string name="pref_highlight_speed_desc">Add highlight on max speed</string>
     <string name="pref_speed_threshold">Speed Threshold</string>
     <string name="pref_auto_highlights">Auto-Highlights</string>
+    <string name="pref_highlight_climb">Summit Highlight</string>
+    <string name="pref_highlight_climb_desc">Add highlight at climb summit</string>
+    <string name="pref_highlight_hr_zone5">HR Zone 5 Highlight</string>
+    <string name="pref_highlight_hr_zone5_desc">Add highlight on max heart rate zone</string>
+    <string name="pref_highlight_descent">Descent Highlight</string>
+    <string name="pref_highlight_descent_desc">Add highlight on high-speed descent</string>
+    <string name="pref_descent_threshold">Descent Speed</string>
+    <string name="pref_highlight_bookmark">Ride Bookmarks</string>
+    <string name="pref_highlight_bookmark_desc">Add highlight at ride start/end</string>
+
+    <!-- Settings: video -->
+    <string name="pref_cat_video">Video Settings</string>
+    <string name="pref_video_resolution">Resolution</string>
+    <string name="pref_video_fps">FPS</string>
+    <string name="pref_video_fov">FOV</string>
+    <string name="pref_video_hypersmooth">HyperSmooth</string>
+    <string name="pref_video_no_change">Camera default</string>
 
     <!-- Settings: alerts -->
     <string name="pref_battery_low">Low Battery</string>

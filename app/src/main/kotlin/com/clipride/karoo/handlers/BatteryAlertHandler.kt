@@ -2,6 +2,7 @@ package com.clipride.karoo.handlers
 
 import com.clipride.R
 import com.clipride.ble.GoProBleManager
+import com.clipride.ble.GoProCommands
 import com.clipride.karoo.ClipRidePreferences
 import com.clipride.util.consumerFlow
 import io.hammerhead.karooext.KarooSystemService
@@ -15,12 +16,15 @@ class BatteryAlertHandler(
     private val scope: CoroutineScope,
     private val karooSystem: KarooSystemService,
     private val bleManager: GoProBleManager,
+    private val commands: GoProCommands,
     private val preferences: ClipRidePreferences,
 ) {
     private var rideState: RideState = RideState.Idle
     private var alertedLow = false
     private var alertedCritical = false
     private var alertedSdLow = false
+    private var alertedOverheat = false
+    private var alertedCold = false
 
     fun start() {
         // Track ride state
@@ -100,12 +104,79 @@ class BatteryAlertHandler(
                 }
             }
         }
+
+        // Overheating monitoring
+        scope.launch {
+            bleManager.isOverheating.collect { overheating ->
+                if (overheating && !alertedOverheat) {
+                    alertedOverheat = true
+                    Timber.w("Camera OVERHEATING — auto-stopping recording")
+                    // Auto-stop recording to protect camera
+                    if (bleManager.isRecording.value) {
+                        try {
+                            commands.stopRecording()
+                        } catch (e: Exception) {
+                            Timber.w(e, "Failed to auto-stop recording on overheat")
+                        }
+                    }
+                    karooSystem.dispatch(
+                        InRideAlert(
+                            id = "gopro_overheat",
+                            icon = R.drawable.ic_thermal,
+                            title = "Camera: Overheating!",
+                            detail = "Recording stopped",
+                            autoDismissMs = 8000L,
+                            backgroundColor = R.color.alert_critical,
+                            textColor = R.color.white,
+                        ),
+                    )
+                } else if (!overheating && alertedOverheat) {
+                    alertedOverheat = false
+                    Timber.d("Camera cooled down")
+                    karooSystem.dispatch(
+                        InRideAlert(
+                            id = "gopro_cooled",
+                            icon = R.drawable.ic_thermal,
+                            title = "Camera: Cooled Down",
+                            detail = "Ready to record",
+                            autoDismissMs = 3000L,
+                            backgroundColor = R.color.status_connected,
+                            textColor = R.color.white,
+                        ),
+                    )
+                }
+            }
+        }
+
+        // Cold monitoring
+        scope.launch {
+            bleManager.isCold.collect { cold ->
+                if (cold && !alertedCold) {
+                    alertedCold = true
+                    Timber.d("Camera cold temperature warning")
+                    karooSystem.dispatch(
+                        InRideAlert(
+                            id = "gopro_cold",
+                            icon = R.drawable.ic_thermal,
+                            title = "Camera: Cold",
+                            detail = "Battery life may be reduced",
+                            autoDismissMs = 5000L,
+                            backgroundColor = R.color.alert_cold,
+                            textColor = R.color.white,
+                        ),
+                    )
+                } else if (!cold && alertedCold) {
+                    alertedCold = false
+                }
+            }
+        }
     }
 
     private fun resetAlerts() {
         alertedLow = false
         alertedCritical = false
         alertedSdLow = false
+        // Don't reset thermal alerts — they are state-driven, not ride-driven
     }
 
     companion object {

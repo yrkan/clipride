@@ -16,6 +16,9 @@ object GoProStatus {
     /** Overheating. 1 byte: 0=normal, 1=overheating */
     const val OVERHEATING: Byte = 6
 
+    /** Cold temperature. 1 byte: 0=normal, 1=cold */
+    const val COLD: Byte = 85
+
     /** Video recording duration in seconds. 4 bytes */
     const val VIDEO_DURATION: Byte = 13
 

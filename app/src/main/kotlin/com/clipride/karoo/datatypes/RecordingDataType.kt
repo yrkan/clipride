@@ -50,6 +50,21 @@ class RecordingDataType(
         }
 
         val job = CoroutineScope(Dispatchers.IO).launch {
+            // Render initial state immediately so view is not blank on screen return
+            try {
+                val result = glance.compose(context, DpSize.Unspecified) {
+                    RecordingView(
+                        bleManager.connectionState.value,
+                        bleManager.isRecording.value,
+                        bleManager.displayDuration.value,
+                        toggleIntent,
+                    )
+                }
+                emitter.updateView(result.remoteViews)
+            } catch (e: Exception) {
+                Timber.w(e, "RecordingDataType: initial render failed")
+            }
+
             combine(
                 bleManager.connectionState,
                 bleManager.isRecording,

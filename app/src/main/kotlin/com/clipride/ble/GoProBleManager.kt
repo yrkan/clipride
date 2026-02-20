@@ -41,6 +41,7 @@ import no.nordicsemi.kotlin.ble.core.ConnectionState
 import no.nordicsemi.kotlin.ble.core.WriteType
 import no.nordicsemi.kotlin.ble.core.util.mergeIndexed
 import timber.log.Timber
+import java.util.concurrent.CopyOnWriteArrayList
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.coroutineContext
@@ -156,6 +157,15 @@ class GoProBleManager @Inject constructor(
     private val _isReady = MutableStateFlow(false)
     val isReady: StateFlow<Boolean> = _isReady.asStateFlow()
 
+    private val _isOverheating = MutableStateFlow(false)
+    val isOverheating: StateFlow<Boolean> = _isOverheating.asStateFlow()
+
+    private val _isCold = MutableStateFlow(false)
+    val isCold: StateFlow<Boolean> = _isCold.asStateFlow()
+
+    private val _activeHilights = MutableStateFlow(0)
+    val activeHilights: StateFlow<Int> = _activeHilights.asStateFlow()
+
     private var connectedPeripheral: Peripheral? = null
     private var commandChar: RemoteCharacteristic? = null
     private var settingChar: RemoteCharacteristic? = null
@@ -163,7 +173,7 @@ class GoProBleManager @Inject constructor(
     private var netMgmtChar: RemoteCharacteristic? = null
     private var keepAliveJob: Job? = null
     private var statusPollingJob: Job? = null
-    private var notificationJobs = mutableListOf<Job>()
+    private var notificationJobs = CopyOnWriteArrayList<Job>()
 
     // --- Persistent connection management ---
 
@@ -758,6 +768,21 @@ class GoProBleManager @Inject constructor(
                 GoProStatus.READY -> {
                     _isReady.value = value.isNotEmpty() && value[0] != 0.toByte()
                 }
+                GoProStatus.OVERHEATING -> {
+                    val hot = value.isNotEmpty() && value[0] != 0.toByte()
+                    log("status: overheating=$hot")
+                    _isOverheating.value = hot
+                }
+                GoProStatus.COLD -> {
+                    val cold = value.isNotEmpty() && value[0] != 0.toByte()
+                    log("status: cold=$cold")
+                    _isCold.value = cold
+                }
+                GoProStatus.ACTIVE_HILIGHTS -> {
+                    val count = if (value.isNotEmpty()) value[0].toInt() and 0xFF else 0
+                    log("status: hilights=$count")
+                    _activeHilights.value = count
+                }
             }
         }
     }
@@ -770,7 +795,10 @@ class GoProBleManager @Inject constructor(
             GoProStatus.VIDEO_DURATION,
             GoProStatus.PRESET_GROUP,
             GoProStatus.BUSY,
-            GoProStatus.READY
+            GoProStatus.READY,
+            GoProStatus.OVERHEATING,
+            GoProStatus.COLD,
+            GoProStatus.ACTIVE_HILIGHTS,
         )
         val payload = byteArrayOf(0x52) + statusIds
         val result = sendQuery(payload)
@@ -795,6 +823,34 @@ class GoProBleManager @Inject constructor(
             log("postConnect: AP_OFF FAILED: ${apOffResult.exceptionOrNull()?.message}")
         } else {
             log("postConnect: AP_OFF OK")
+        }
+        // Sync date/time
+        syncCameraDateTime()
+    }
+
+    private suspend fun syncCameraDateTime() {
+        try {
+            val cal = java.util.Calendar.getInstance()
+            val year = cal.get(java.util.Calendar.YEAR)
+            val payload = byteArrayOf(
+                0x0D,
+                0x07,
+                (year shr 8).toByte(),
+                (year and 0xFF).toByte(),
+                (cal.get(java.util.Calendar.MONTH) + 1).toByte(),
+                cal.get(java.util.Calendar.DAY_OF_MONTH).toByte(),
+                cal.get(java.util.Calendar.HOUR_OF_DAY).toByte(),
+                cal.get(java.util.Calendar.MINUTE).toByte(),
+                cal.get(java.util.Calendar.SECOND).toByte(),
+            )
+            val result = sendCommand(payload)
+            if (result.isSuccess) {
+                log("postConnect: SetDateTime OK")
+            } else {
+                log("postConnect: SetDateTime FAILED: ${result.exceptionOrNull()?.message}")
+            }
+        } catch (e: Exception) {
+            log("postConnect: SetDateTime ERROR: ${e.javaClass.simpleName}: ${e.message}")
         }
     }
 
@@ -826,6 +882,9 @@ class GoProBleManager @Inject constructor(
         _displayDuration.value = 0
         _isBusy.value = false
         _isReady.value = false
+        _isOverheating.value = false
+        _isCold.value = false
+        _activeHilights.value = 0
         if (full) {
             _batteryLevel.value = null
             _sdCardRemaining.value = null
@@ -987,7 +1046,9 @@ class GoProBleManager @Inject constructor(
             GoProStatus.VIDEO_DURATION,
             GoProStatus.PRESET_GROUP,
             GoProStatus.BUSY,
-            GoProStatus.READY
+            GoProStatus.READY,
+            GoProStatus.OVERHEATING,
+            GoProStatus.COLD,
         )
         val payload = byteArrayOf(0x13) + statusIds
         val maxLen = peripheral.maximumWriteValueLength(WriteType.WITHOUT_RESPONSE)

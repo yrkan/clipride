@@ -18,10 +18,14 @@ No phone needed. No WiFi needed. Just Bluetooth.
 
 - **Start/Stop Recording** — one tap on the data field or via the Bonus Action button in the ride screen side menu
 - **Add Highlight Markers** — tag key moments during your ride for GoPro Quik auto-editing. Works with manual tap or automatic triggers (see Auto-Highlights below)
+- **Mode Switching** — cycle between Video, Photo, and Timelapse modes with a single tap on the Mode data field
+- **Quick Photo** — tap the Photo data field to instantly capture a photo. Automatically switches to photo mode, takes the shot, and switches back to video — all without stopping
 - **Camera Power** — put the camera to sleep or wake it up directly from a data field
+- **Video Settings** — configure resolution (1080p / 2.7K / 4K / 5.3K), frame rate (24 / 30 / 60 / 120 fps), field of view (Wide / Linear / Narrow / SuperView), and HyperSmooth stabilization from the ClipRide settings screen. Settings are applied automatically every time the camera connects
 - **Battery Monitoring** — real-time battery percentage with color-coded thresholds: green (30%+), yellow (15-29%), red (<15%)
 - **SD Card Status** — remaining recording time displayed in hours and minutes
 - **Recording Timer** — live duration counter that ticks every second during recording, synchronized with the camera's internal clock every 5 seconds
+- **Date/Time Sync** — camera date and time are automatically synchronized with the Karoo on every connection
 
 ### Auto-Record
 
@@ -36,46 +40,57 @@ Automatically control recording based on your ride state:
 
 ### Auto-Highlights
 
-Automatically add GoPro highlight markers during your ride based on performance events. Each auto-highlight has a 5-second cooldown to prevent spam. Available triggers:
+Automatically add GoPro highlight markers during your ride based on performance and navigation events. Each trigger has its own cooldown to prevent spam. Available triggers:
 
-- **Lap Highlight** — adds a highlight every time you press the lap button on Karoo
-- **Peak Power Highlight** — adds a highlight when your power output exceeds a configurable threshold (default: 500W)
-- **Max Speed Highlight** — adds a highlight when your speed exceeds a configurable threshold (default: 50 km/h)
+**Basic triggers:**
+- **Lap Highlight** — adds a highlight every time you press the lap button on Karoo (5s cooldown)
+- **Peak Power Highlight** — adds a highlight when your power output exceeds a configurable threshold (default: 500W, 5s cooldown)
+- **Max Speed Highlight** — adds a highlight when your speed exceeds a configurable threshold (default: 50 km/h, 5s cooldown)
+
+**Smart Highlights 2.0** — context-aware triggers that use Karoo's navigation, heart rate, and sensor data:
+- **Climb Summit Highlight** — adds a highlight when you reach the top of a climb detected by Karoo's route navigation. Uses the climb's start distance and length to detect when you've completed the ascent
+- **HR Zone 5 Highlight** — adds a highlight when your heart rate enters zone 5 (max effort), using your heart rate zones from the Karoo user profile (30s cooldown)
+- **High-Speed Descent Highlight** — adds a highlight when your speed exceeds a configurable threshold while the road gradient is steeper than -3% (60s cooldown)
+- **Ride Bookmarks** — automatically adds highlights at ride start and ride end, marking the beginning and end of your footage for easy navigation in post-production (default: on)
 
 Each trigger can be individually enabled or disabled and configured with its own threshold.
 
-### Battery & SD Card Alerts
+### Battery, SD Card & Thermal Alerts
 
 In-ride alerts displayed directly on the Karoo screen during recording:
 
 - **Low Battery Alert** — shown once per ride when the camera battery drops below the configured low threshold (default: 20%). Displayed as a yellow banner for 3 seconds.
 - **Critical Battery Alert** — shown once per ride when the battery drops below the configured critical threshold (default: 10%). Displayed as a red banner for 5 seconds. Takes priority over the low battery alert if both thresholds are crossed simultaneously.
 - **SD Card Low Alert** — shown once per ride when the remaining recording time on the SD card drops below 5 minutes. Displayed as a red banner for 5 seconds with the remaining time in minutes.
+- **Overheating Alert** — shown when the camera reports an overheating condition. Recording is automatically stopped to protect the camera. A recovery alert is displayed when the camera cools down.
+- **Cold Temperature Alert** — shown when the camera reports a cold temperature condition. Informational only — recording continues but battery life may be reduced.
 
-All alerts reset at the beginning of each new ride. Alerts are only triggered while the ride is actively recording (not during pause or idle states).
+All alerts reset at the beginning of each new ride. Battery and SD card alerts are only triggered while the ride is actively recording (not during pause or idle states). Thermal alerts are active whenever the camera is connected.
 
 ### Data Fields
 
-Four data fields available for your Karoo ride screens:
+Six data fields available for your Karoo ride screens:
 
 | Data Field | Type ID | Description | Tap Action | Sizes |
 |---|---|---|---|---|
-| **Camera Status** | `gopro-status` | Combined view: recording state indicator, duration timer, battery percentage, and SD card remaining time | Toggle recording | Full / Half / Quarter (adapts layout to available space) |
+| **Camera Status** | `gopro-status` | Combined view: recording state, duration timer, battery %, SD card remaining, highlight count | Toggle recording | Full / Half / Quarter (adapts layout) |
 | **Battery** | `gopro-battery` | Camera battery percentage with color-coded display | None | Any |
 | **Recording** | `gopro-recording` | Recording timer when active, "REC" prompt when idle, with hint text ("tap to start" / "tap to stop") | Toggle recording | Any |
 | **Power** | `gopro-power` | Camera connection/power state: ON (green) / SCAN / WAIT / PAIR / OFF (gray) | Toggle power (sleep/wake) | Any |
+| **Mode** | `gopro-mode` | Current camera mode: VIDEO (red) / PHOTO (green) / TLPS (yellow) | Cycle modes (Video → Photo → Timelapse → Video) | Any |
+| **Photo** | `gopro-photo` | Quick photo capture button. Shows "PHOTO" when connected | Take photo (auto mode-switch + capture + restore) | Any |
 
 All data fields display "---" when the camera is not connected. Fields update in real-time:
 - Battery updates every 5 seconds (from status poll or push notification)
 - Recording timer ticks every second with a local counter, re-synchronized with the camera's actual duration every 5 seconds
-- Connection state changes are reflected immediately
+- Connection state and mode changes are reflected immediately
 
 #### Camera Status Tiers
 
 The Camera Status data field adapts its layout based on the grid cell size:
 
-- **Full** (large cell): Status dot + "REC"/"IDLE" label + duration timer on one line, battery percentage on second line, "SD: Xh Ym" on third line
-- **Half** (medium cell): Status dot + duration timer on one line, battery + SD on second line
+- **Full** (large cell): Status dot + "REC"/"IDLE" label + duration timer on one line, battery percentage + highlight count on second line, "SD: Xh Ym" on third line
+- **Half** (medium cell): Status dot + duration timer on one line, battery + SD + highlight count on second line
 - **Quarter** (small cell): Status dot + battery percentage only
 
 ### Connection Management
@@ -90,7 +105,7 @@ The Camera Status data field adapts its layout based on the grid cell size:
 
 ### Bonus Actions
 
-Three Bonus Action buttons accessible from the Karoo ride screen side menu:
+Three Bonus Action buttons accessible from the Karoo ride screen side menu (in addition to tap actions on data fields):
 
 - **Record** — toggle recording on/off
 - **Highlight** — add a GoPro highlight marker at the current moment
@@ -185,12 +200,14 @@ adb install app/build/outputs/apk/debug/clipride.apk
 1. Go to your ride profile on Karoo
 2. Edit a ride page layout
 3. Tap "Add Field" → scroll to the **ClipRide** section
-4. Choose from four fields: **Camera Status**, **Battery**, **Recording**, or **Power**
+4. Choose from six fields: **Camera Status**, **Battery**, **Recording**, **Power**, **Mode**, or **Photo**
 5. During a ride, tap the Recording, Status, or Power fields to interact with the camera
 
 ### Recommended Data Field Setup
 
-For most riders, a single **Camera Status** field in a full or half-size cell provides all the information you need: recording state, duration, battery, and SD card capacity. Add a **Power** field if you want to put the camera to sleep and wake it from the Karoo.
+For most riders, a single **Camera Status** field in a full or half-size cell provides all the information you need: recording state, duration, battery, SD card capacity, and highlight count. Add a **Power** field if you want to put the camera to sleep and wake it from the Karoo.
+
+For content creators, add the **Mode** field to switch between Video/Photo/Timelapse without reaching for the camera, and the **Photo** field for one-tap photo capture while riding.
 
 If you prefer dedicated fields, use **Recording** (for the timer and tap-to-record) and **Battery** (for a large, easy-to-read percentage).
 
@@ -215,6 +232,24 @@ All settings are accessible from the ClipRide settings screen on Karoo. Tap the 
 | Power Threshold | 300W - 1000W | 500W | Watt threshold for power highlights |
 | Speed Highlight | On / Off | Off | Add a highlight when speed exceeds the threshold |
 | Speed Threshold | 30 - 80 km/h | 50 km/h | Speed threshold for speed highlights |
+| Summit Highlight | On / Off | Off | Add a highlight when reaching the top of a climb |
+| HR Zone 5 Highlight | On / Off | Off | Add a highlight when heart rate enters max effort zone |
+| Descent Highlight | On / Off | Off | Add a highlight on high-speed descents (grade < -3%) |
+| Descent Speed | 40 - 80 km/h | 50 km/h | Speed threshold for descent highlights |
+| Ride Bookmarks | On / Off | On | Add highlights at ride start and ride end |
+
+### Video Settings
+
+| Setting | Options | Default | Description |
+|---|---|---|---|
+| Resolution | Camera default / 1080p / 2.7K / 4K / 5.3K | Camera default | Video resolution applied on each camera connection |
+| FPS | Camera default / 24 / 30 / 60 / 120 | Camera default | Frame rate applied on each camera connection |
+| FOV | Camera default / Wide / Linear / Narrow / SuperView | Camera default | Field of view / lens mode applied on each camera connection |
+| HyperSmooth | Camera default / Off / On / High / Boost / Auto Boost | Camera default | Stabilization level applied on each camera connection |
+
+Video settings are sent to the camera via BLE setting writes immediately after connection is established. "Camera default" means ClipRide does not modify that setting, preserving whatever the camera was last configured with.
+
+**Note:** Video settings cannot be changed while recording — this is a GoPro firmware limitation. If you need to change settings mid-ride, stop recording first.
 
 ### Alert Settings
 
@@ -273,15 +308,16 @@ ClipRide subscribes to the three response characteristics (CQ_COMMAND_RSP, CQ_SE
 
 ### 6. Post-Connect Commands
 
-Three commands are sent in sequence after notification subscriptions are active:
+Four commands are sent in sequence after notification subscriptions are active:
 
 1. **SetPairingComplete** — a Protobuf message on the Network Management characteristic containing the device name "ClipRide"
 2. **SetCameraControl(EXTERNAL)** — a Protobuf command (`FeatureId=0xF1, ActionId=0x69`) that tells the camera an external device is in control
 3. **AP_OFF** — disables the camera's WiFi access point (`0x17 0x01 0x00`) to save battery and avoid interference with Karoo connectivity
+4. **SetDateTime** — synchronizes the camera's date and time with the Karoo's current time (`0x0D` command with 7-byte payload: year big-endian, month, day, hour, minute, second)
 
 ### 7. Status Registration
 
-ClipRide registers for push notifications on 7 status IDs via a CQ_QUERY register command (`0x52`):
+ClipRide registers for push notifications on 9 status IDs via a CQ_QUERY register command (`0x52`):
 
 | Status ID | Name | Size | Description |
 |---|---|---|---|
@@ -292,6 +328,8 @@ ClipRide registers for push notifications on 7 status IDs via a CQ_QUERY registe
 | 96 | PRESET_GROUP | 4 bytes | Currently active preset group ID |
 | 8 | BUSY | 1 byte | Whether the camera is processing (0=idle, 1=busy) |
 | 82 | READY | 1 byte | Whether the camera is ready for commands |
+| 6 | OVERHEATING | 1 byte | Whether the camera is overheating (0=normal, 1=overheating) |
+| 85 | COLD | 1 byte | Whether the camera is in cold temperature condition (0=normal, 1=cold) |
 
 The register response includes the initial values for all status IDs, which populate the StateFlows before the connection state is set to CONNECTED. This ensures data fields display correct values immediately upon connection.
 
@@ -300,7 +338,8 @@ The register response includes the initial values for all status IDs, which popu
 Once connected, two background tasks run continuously:
 
 - **Keep-Alive** (every 60 seconds): writes `0x5B 0x01 0x42` to CQ_SETTING (a LED setting update that the camera treats as a heartbeat). If 3 consecutive keep-alive writes fail, the task stops and waits for the natural BLE disconnect to trigger reconnection.
-- **Status Poll** (every 5 seconds): queries all 7 status IDs via CQ_QUERY (`0x13` command) to ensure values stay synchronized even if push notifications are missed.
+- **Status Poll** (every 5 seconds): queries all 9 status IDs via CQ_QUERY (`0x13` command) to ensure values stay synchronized even if push notifications are missed.
+- **Video Settings** (on connect): if the user has configured video settings (resolution, FPS, FOV, HyperSmooth), they are applied via CQ_SETTING writes after the connection is fully established.
 
 The camera also sends asynchronous push notifications via CQ_QUERY_RSP when status values change (e.g., recording starts/stops, battery level changes).
 
@@ -341,14 +380,14 @@ Karoo Layer
 ├── GoProDevice             Bridges BLE StateFlows → Karoo DeviceEvent system
 ├── ClipRideActionReceiver  BroadcastReceiver for tap actions on data fields
 ├── ClipRidePreferences     SharedPreferences wrapper for all settings
-├── DataTypes               4 Glance-based data fields (Battery, Recording, Status, Power)
+├── DataTypes               6 Glance-based data fields (Battery, Recording, Status, Power, Mode, Photo)
 │   └── glance/             Shared Glance components (DataFieldContainer, ValueText, StatusDot, colors)
 └── Handlers                3 ride event handlers (AutoRecord, BatteryAlert, HighlightEvent)
 
 BLE Layer
 ├── GoProBleManager         Connection lifecycle, reconnect loop, keep-alive, status polling, StateFlows
 ├── GoProBleProtocol        TLV fragmentation/reassembly using Nordic mergeIndexed + MergeResult
-├── GoProCommands           High-level command API (shutter, highlight, preset, sleep, hardware info)
+├── GoProCommands           High-level command API (shutter, highlight, preset, sleep, hardware info, video settings, date/time sync)
 ├── GoProStatus             BLE status ID and setting ID constants
 ├── GoProUuid               BLE service and characteristic UUID constants
 ├── CameraCompatibility     Model detection and known issues registry

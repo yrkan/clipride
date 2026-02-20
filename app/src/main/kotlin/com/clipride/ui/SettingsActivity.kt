@@ -115,6 +115,15 @@ private fun SettingsScreen(
     var powerThreshold by remember { mutableStateOf(preferences.peakPowerThreshold) }
     var highlightSpeed by remember { mutableStateOf(preferences.highlightOnMaxSpeed) }
     var speedThreshold by remember { mutableStateOf(preferences.maxSpeedThreshold) }
+    var videoResolution by remember { mutableStateOf(preferences.videoResolution) }
+    var videoFps by remember { mutableStateOf(preferences.videoFps) }
+    var videoFov by remember { mutableStateOf(preferences.videoFov) }
+    var videoHyperSmooth by remember { mutableStateOf(preferences.videoHyperSmooth) }
+    var highlightClimb by remember { mutableStateOf(preferences.highlightOnClimbSummit) }
+    var highlightHrZone5 by remember { mutableStateOf(preferences.highlightOnHrZone5) }
+    var highlightDescent by remember { mutableStateOf(preferences.highlightOnDescent) }
+    var descentThreshold by remember { mutableStateOf(preferences.descentSpeedThreshold) }
+    var highlightBookmark by remember { mutableStateOf(preferences.highlightOnRideBookmark) }
     var batteryLow by remember { mutableStateOf(preferences.batteryLowThreshold) }
     var batteryCritical by remember { mutableStateOf(preferences.batteryCriticalThreshold) }
 
@@ -138,6 +147,15 @@ private fun SettingsScreen(
         powerThreshold = preferences.peakPowerThreshold
         highlightSpeed = preferences.highlightOnMaxSpeed
         speedThreshold = preferences.maxSpeedThreshold
+        videoResolution = preferences.videoResolution
+        videoFps = preferences.videoFps
+        videoFov = preferences.videoFov
+        videoHyperSmooth = preferences.videoHyperSmooth
+        highlightClimb = preferences.highlightOnClimbSummit
+        highlightHrZone5 = preferences.highlightOnHrZone5
+        highlightDescent = preferences.highlightOnDescent
+        descentThreshold = preferences.descentSpeedThreshold
+        highlightBookmark = preferences.highlightOnRideBookmark
         batteryLow = preferences.batteryLowThreshold
         batteryCritical = preferences.batteryCriticalThreshold
         refreshKey++
@@ -152,6 +170,16 @@ private fun SettingsScreen(
     val delayValues = listOf(0, 5, 10, 15)
     val powerOptions = listOf(300, 400, 500, 600, 700, 800, 1000)
     val speedOptions = listOf(30, 40, 50, 60, 70, 80)
+    val descentSpeedOptions = listOf(40, 50, 60, 70, 80)
+    val noChange = stringResource(R.string.pref_video_no_change)
+    val resolutionLabels = listOf(noChange, "1080p", "2.7K", "4K", "5.3K")
+    val resolutionValues = listOf(-1, 9, 4, 1, 18)
+    val fpsLabels = listOf(noChange, "24", "30", "60", "120")
+    val fpsValues = listOf(-1, 10, 8, 5, 1)
+    val fovLabels = listOf(noChange, "Wide", "Linear", "Narrow", "SuperView")
+    val fovValues = listOf(-1, 0, 4, 2, 3)
+    val hsLabels = listOf(noChange, "Off", "On", "High", "Boost", "Auto Boost")
+    val hsValues = listOf(-1, 0, 1, 2, 3, 4)
     val batteryLowOptions = listOf(15, 20, 25, 30)
     val batteryCriticalOptions = listOf(5, 10, 15)
 
@@ -335,6 +363,52 @@ private fun SettingsScreen(
 
         Spacer(Modifier.height(Spacing.md))
 
+        // Video settings section
+        SettingsSection(stringResource(R.string.pref_cat_video)) {
+            SettingsPickerRow(
+                title = stringResource(R.string.pref_video_resolution),
+                options = resolutionLabels,
+                values = resolutionValues,
+                selectedValue = videoResolution,
+                onSelect = {
+                    videoResolution = it
+                    preferences.videoResolution = it
+                },
+            )
+            SettingsPickerRow(
+                title = stringResource(R.string.pref_video_fps),
+                options = fpsLabels,
+                values = fpsValues,
+                selectedValue = videoFps,
+                onSelect = {
+                    videoFps = it
+                    preferences.videoFps = it
+                },
+            )
+            SettingsPickerRow(
+                title = stringResource(R.string.pref_video_fov),
+                options = fovLabels,
+                values = fovValues,
+                selectedValue = videoFov,
+                onSelect = {
+                    videoFov = it
+                    preferences.videoFov = it
+                },
+            )
+            SettingsPickerRow(
+                title = stringResource(R.string.pref_video_hypersmooth),
+                options = hsLabels,
+                values = hsValues,
+                selectedValue = videoHyperSmooth,
+                onSelect = {
+                    videoHyperSmooth = it
+                    preferences.videoHyperSmooth = it
+                },
+            )
+        }
+
+        Spacer(Modifier.height(Spacing.md))
+
         // Highlights section
         SettingsSection(stringResource(R.string.pref_cat_highlights)) {
             SettingsSwitchRow(
@@ -382,6 +456,49 @@ private fun SettingsScreen(
                     preferences.maxSpeedThreshold = it
                 },
                 enabled = highlightSpeed,
+            )
+            SettingsSwitchRow(
+                title = stringResource(R.string.pref_highlight_climb),
+                checked = highlightClimb,
+                onCheckedChange = {
+                    highlightClimb = it
+                    preferences.highlightOnClimbSummit = it
+                },
+            )
+            SettingsSwitchRow(
+                title = stringResource(R.string.pref_highlight_hr_zone5),
+                checked = highlightHrZone5,
+                onCheckedChange = {
+                    highlightHrZone5 = it
+                    preferences.highlightOnHrZone5 = it
+                },
+            )
+            SettingsSwitchRow(
+                title = stringResource(R.string.pref_highlight_descent),
+                checked = highlightDescent,
+                onCheckedChange = {
+                    highlightDescent = it
+                    preferences.highlightOnDescent = it
+                },
+            )
+            SettingsPickerRow(
+                title = stringResource(R.string.pref_descent_threshold),
+                options = descentSpeedOptions.map { "${it} km/h" },
+                values = descentSpeedOptions,
+                selectedValue = descentThreshold,
+                onSelect = {
+                    descentThreshold = it
+                    preferences.descentSpeedThreshold = it
+                },
+                enabled = highlightDescent,
+            )
+            SettingsSwitchRow(
+                title = stringResource(R.string.pref_highlight_bookmark),
+                checked = highlightBookmark,
+                onCheckedChange = {
+                    highlightBookmark = it
+                    preferences.highlightOnRideBookmark = it
+                },
             )
         }
 

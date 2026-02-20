@@ -1,6 +1,7 @@
 package com.clipride.ble
 
 import timber.log.Timber
+import java.util.Calendar
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -88,6 +89,75 @@ class GoProCommands @Inject constructor(
                 throw IllegalStateException("GetHardwareInfo failed: status=${(resp as? BleResponse.Command)?.status}")
             }
             parseHardwareInfo(resp.payload)
+        }
+    }
+
+    // --- Date/Time Sync ---
+
+    /**
+     * Sync camera date/time with current device time.
+     * Command 0x0D: SetDateTime with 7-byte payload (YYYY big-endian, MM, DD, HH, MM, SS).
+     */
+    suspend fun syncDateTime(): Result<Unit> {
+        val cal = Calendar.getInstance()
+        val year = cal.get(Calendar.YEAR)
+        val payload = byteArrayOf(
+            0x0D,
+            0x07, // param length
+            (year shr 8).toByte(),
+            (year and 0xFF).toByte(),
+            (cal.get(Calendar.MONTH) + 1).toByte(),
+            cal.get(Calendar.DAY_OF_MONTH).toByte(),
+            cal.get(Calendar.HOUR_OF_DAY).toByte(),
+            cal.get(Calendar.MINUTE).toByte(),
+            cal.get(Calendar.SECOND).toByte(),
+        )
+        Timber.d("Syncing date/time: ${year}-${cal.get(Calendar.MONTH) + 1}-${cal.get(Calendar.DAY_OF_MONTH)} " +
+            "${cal.get(Calendar.HOUR_OF_DAY)}:${cal.get(Calendar.MINUTE)}:${cal.get(Calendar.SECOND)}")
+        return bleManager.sendCommand(payload).map { }
+    }
+
+    // --- Video Settings ---
+
+    /**
+     * Apply a single video setting by ID and value.
+     * Setting payload format: [settingId, paramLen=1, value]
+     */
+    suspend fun applySetting(settingId: Byte, value: Int): Result<Unit> {
+        val payload = byteArrayOf(settingId, 0x01, value.toByte())
+        Timber.d("Applying setting: id=${settingId.toInt() and 0xFF}, value=$value")
+        return bleManager.sendSetting(payload).map { }
+    }
+
+    /**
+     * Apply saved video settings from preferences.
+     * Skips settings with value -1 (= "don't change").
+     */
+    suspend fun applyVideoSettings(
+        resolution: Int,
+        fps: Int,
+        fov: Int,
+        hyperSmooth: Int,
+    ) {
+        if (resolution >= 0) {
+            applySetting(GoProSetting.VIDEO_RESOLUTION, resolution).onFailure {
+                Timber.w("Failed to set resolution: ${it.message}")
+            }
+        }
+        if (fps >= 0) {
+            applySetting(GoProSetting.FPS, fps).onFailure {
+                Timber.w("Failed to set FPS: ${it.message}")
+            }
+        }
+        if (fov >= 0) {
+            applySetting(GoProSetting.VIDEO_LENS, fov).onFailure {
+                Timber.w("Failed to set FOV: ${it.message}")
+            }
+        }
+        if (hyperSmooth >= 0) {
+            applySetting(GoProSetting.HYPERSMOOTH, hyperSmooth).onFailure {
+                Timber.w("Failed to set HyperSmooth: ${it.message}")
+            }
         }
     }
 

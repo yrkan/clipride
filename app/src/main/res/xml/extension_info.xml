@@ -34,6 +34,20 @@
         graphical="true"
         icon="@drawable/ic_clipride" />
 
+    <DataType
+        typeId="gopro-mode"
+        displayName="@string/dt_mode"
+        description="@string/dt_mode_desc"
+        graphical="true"
+        icon="@drawable/ic_clipride" />
+
+    <DataType
+        typeId="gopro-photo"
+        displayName="@string/dt_photo"
+        description="@string/dt_photo_desc"
+        graphical="true"
+        icon="@drawable/ic_clipride" />
+
     <BonusAction
         displayName="@string/action_toggle_rec"
         actionId="toggle-recording" />

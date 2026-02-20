@@ -49,6 +49,50 @@ class ClipRidePreferences @Inject constructor(
         get() = prefs.getString("max_speed_threshold", "50")?.toIntOrNull() ?: 50
         set(value) = prefs.edit().putString("max_speed_threshold", value.toString()).apply()
 
+    // --- Smart Highlights 2.0 ---
+
+    var highlightOnClimbSummit: Boolean
+        get() = prefs.getBoolean("highlight_on_climb_summit", false)
+        set(value) = prefs.edit().putBoolean("highlight_on_climb_summit", value).apply()
+
+    var highlightOnHrZone5: Boolean
+        get() = prefs.getBoolean("highlight_on_hr_zone5", false)
+        set(value) = prefs.edit().putBoolean("highlight_on_hr_zone5", value).apply()
+
+    var highlightOnDescent: Boolean
+        get() = prefs.getBoolean("highlight_on_descent", false)
+        set(value) = prefs.edit().putBoolean("highlight_on_descent", value).apply()
+
+    var descentSpeedThreshold: Int
+        get() = prefs.getString("descent_speed_threshold", "50")?.toIntOrNull() ?: 50
+        set(value) = prefs.edit().putString("descent_speed_threshold", value.toString()).apply()
+
+    var highlightOnRideBookmark: Boolean
+        get() = prefs.getBoolean("highlight_on_ride_bookmark", true)
+        set(value) = prefs.edit().putBoolean("highlight_on_ride_bookmark", value).apply()
+
+    // --- Video Settings ---
+
+    /** Video resolution setting value. -1 = don't change. */
+    var videoResolution: Int
+        get() = prefs.getString("video_resolution", "-1")?.toIntOrNull() ?: -1
+        set(value) = prefs.edit().putString("video_resolution", value.toString()).apply()
+
+    /** Video FPS setting value. -1 = don't change. */
+    var videoFps: Int
+        get() = prefs.getString("video_fps", "-1")?.toIntOrNull() ?: -1
+        set(value) = prefs.edit().putString("video_fps", value.toString()).apply()
+
+    /** Video FOV/lens setting value. -1 = don't change. */
+    var videoFov: Int
+        get() = prefs.getString("video_fov", "-1")?.toIntOrNull() ?: -1
+        set(value) = prefs.edit().putString("video_fov", value.toString()).apply()
+
+    /** HyperSmooth setting value. -1 = don't change. */
+    var videoHyperSmooth: Int
+        get() = prefs.getString("video_hypersmooth", "-1")?.toIntOrNull() ?: -1
+        set(value) = prefs.edit().putString("video_hypersmooth", value.toString()).apply()
+
     // --- Battery Alerts ---
 
     var batteryLowThreshold: Int

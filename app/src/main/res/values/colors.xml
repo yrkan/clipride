@@ -33,4 +33,5 @@
     <!-- Alerts (for InRideAlert @ColorRes) -->
     <color name="alert_warning">#FFFFC107</color>
     <color name="alert_critical">#FFF44336</color>
+    <color name="alert_cold">#FF2196F3</color>
 </resources>

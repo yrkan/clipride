@@ -49,6 +49,47 @@ class ClipRideActionReceiver : BroadcastReceiver() {
                     }
                 }
             }
+            ACTION_CYCLE_MODE -> {
+                FeedbackHelper.hapticFeedback(context)
+                val pending = goAsync()
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        val currentPreset = bleManager.currentPresetGroup.value
+                        when (currentPreset) {
+                            1000 -> commands.loadPhotoMode()   // Video → Photo
+                            1001 -> commands.loadTimelapseMode() // Photo → Timelapse
+                            else -> commands.loadVideoMode()   // Timelapse/unknown → Video
+                        }
+                    } catch (e: Exception) {
+                        Timber.w(e, "Cycle mode from tap failed")
+                    } finally {
+                        pending.finish()
+                    }
+                }
+            }
+            ACTION_TAKE_PHOTO -> {
+                FeedbackHelper.hapticFeedback(context)
+                val pending = goAsync()
+                CoroutineScope(Dispatchers.IO).launch {
+                    try {
+                        // Switch to photo, capture, switch back to video
+                        val wasPreset = bleManager.currentPresetGroup.value
+                        if (wasPreset != 1001) {
+                            commands.loadPhotoMode()
+                            kotlinx.coroutines.delay(500)
+                        }
+                        commands.startRecording() // In photo mode, shutter = capture
+                        kotlinx.coroutines.delay(500)
+                        if (wasPreset != null && wasPreset != 1001) {
+                            commands.loadVideoMode()
+                        }
+                    } catch (e: Exception) {
+                        Timber.w(e, "Take photo from tap failed")
+                    } finally {
+                        pending.finish()
+                    }
+                }
+            }
             ACTION_TOGGLE_POWER -> {
                 FeedbackHelper.hapticFeedback(context)
                 val pending = goAsync()
@@ -84,5 +125,7 @@ class ClipRideActionReceiver : BroadcastReceiver() {
         const val ACTION_TOGGLE_RECORDING = "com.clipride.ACTION_TOGGLE_RECORDING"
         const val ACTION_ADD_HIGHLIGHT = "com.clipride.ACTION_ADD_HIGHLIGHT"
         const val ACTION_TOGGLE_POWER = "com.clipride.ACTION_TOGGLE_POWER"
+        const val ACTION_CYCLE_MODE = "com.clipride.ACTION_CYCLE_MODE"
+        const val ACTION_TAKE_PHOTO = "com.clipride.ACTION_TAKE_PHOTO"
     }
 }
