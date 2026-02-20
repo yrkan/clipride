@@ -55,6 +55,7 @@ class ModeDataType(
                     ModeView(
                         bleManager.connectionState.value,
                         bleManager.currentPresetGroup.value,
+                        bleManager.isRecording.value,
                         cycleIntent,
                     )
                 }
@@ -66,12 +67,13 @@ class ModeDataType(
             combine(
                 bleManager.connectionState,
                 bleManager.currentPresetGroup,
-            ) { state, preset ->
-                Pair(state, preset)
-            }.conflate().collect { (state, preset) ->
+                bleManager.isRecording,
+            ) { state, preset, recording ->
+                Triple(state, preset, recording)
+            }.conflate().collect { (state, preset, recording) ->
                 try {
                     val result = glance.compose(context, DpSize.Unspecified) {
-                        ModeView(state, preset, cycleIntent)
+                        ModeView(state, preset, recording, cycleIntent)
                     }
                     emitter.updateView(result.remoteViews)
                 } catch (e: Exception) {
@@ -87,13 +89,18 @@ class ModeDataType(
 private fun ModeView(
     state: GoProConnectionState,
     presetGroup: Int?,
+    isRecording: Boolean,
     cycleIntent: Intent,
 ) {
     DataFieldContainer {
+        val baseModifier = GlanceModifier.fillMaxSize()
+        val modifier = if (isRecording && state == GoProConnectionState.CONNECTED) {
+            baseModifier // No clickable — recording in progress
+        } else {
+            baseModifier.clickable(actionSendBroadcast(cycleIntent))
+        }
         Column(
-            modifier = GlanceModifier
-                .fillMaxSize()
-                .clickable(actionSendBroadcast(cycleIntent)),
+            modifier = modifier,
             verticalAlignment = Alignment.CenterVertically,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -109,10 +116,10 @@ private fun ModeView(
                 ValueText(
                     text = modeName,
                     fontSize = 28.sp,
-                    color = modeColor,
+                    color = if (isRecording) GlanceColors.TextDim else modeColor,
                 )
                 LabelText(
-                    text = "tap to switch",
+                    text = if (isRecording) "recording" else "tap to switch",
                     color = GlanceColors.TextDim,
                     fontSize = 11.sp,
                 )

@@ -1,9 +1,11 @@
 package com.clipride.karoo.handlers
 
+import android.content.Context
 import com.clipride.R
 import com.clipride.ble.GoProBleManager
 import com.clipride.ble.GoProCommands
 import com.clipride.karoo.ClipRidePreferences
+import com.clipride.util.FeedbackHelper
 import com.clipride.util.consumerFlow
 import com.clipride.util.streamDataFlow
 import io.hammerhead.karooext.KarooSystemService
@@ -26,6 +28,7 @@ class HighlightEventHandler(
     private val bleManager: GoProBleManager,
     private val commands: GoProCommands,
     private val preferences: ClipRidePreferences,
+    private val context: Context,
 ) {
     private var rideState: RideState = RideState.Idle
     private var highlightCount = 0
@@ -198,6 +201,7 @@ class HighlightEventHandler(
         if (result.isSuccess) {
             highlightCount++
             Timber.d("Auto-highlight #$highlightCount: $detail")
+            FeedbackHelper.hapticFeedback(context)
             karooSystem.dispatch(
                 InRideAlert(
                     id = "gopro_highlight_$highlightCount",

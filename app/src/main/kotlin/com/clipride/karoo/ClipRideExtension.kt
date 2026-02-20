@@ -2,6 +2,7 @@ package com.clipride.karoo
 
 import android.content.Intent
 import com.clipride.BuildConfig
+import com.clipride.R
 import com.clipride.ble.GoProBleManager
 import com.clipride.ble.GoProCommands
 import com.clipride.karoo.datatypes.BatteryDataType
@@ -20,6 +21,7 @@ import io.hammerhead.karooext.extension.KarooExtension
 import io.hammerhead.karooext.internal.Emitter
 import io.hammerhead.karooext.models.Device
 import io.hammerhead.karooext.models.DeviceEvent
+import io.hammerhead.karooext.models.InRideAlert
 import io.hammerhead.karooext.models.ReleaseBluetooth
 import io.hammerhead.karooext.models.RequestBluetooth
 import kotlinx.coroutines.CoroutineScope
@@ -85,7 +87,7 @@ class ClipRideExtension : KarooExtension("clipride", BuildConfig.VERSION_NAME) {
         Timber.d("Starting ride handlers")
         AutoRecordHandler(serviceScope, karooSystem, bleManager, commands, preferences).start()
         BatteryAlertHandler(serviceScope, karooSystem, bleManager, commands, preferences).start()
-        HighlightEventHandler(serviceScope, karooSystem, bleManager, commands, preferences).start()
+        HighlightEventHandler(serviceScope, karooSystem, bleManager, commands, preferences, applicationContext).start()
         startVideoSettingsApplier()
     }
 
@@ -94,12 +96,25 @@ class ClipRideExtension : KarooExtension("clipride", BuildConfig.VERSION_NAME) {
             .filter { it == GoProConnectionState.CONNECTED }
             .onEach {
                 Timber.d("Camera connected, applying video settings")
-                commands.applyVideoSettings(
+                val failed = commands.applyVideoSettings(
                     resolution = preferences.videoResolution,
                     fps = preferences.videoFps,
                     fov = preferences.videoFov,
                     hyperSmooth = preferences.videoHyperSmooth,
                 )
+                if (failed.isNotEmpty()) {
+                    karooSystem.dispatch(
+                        InRideAlert(
+                            id = "gopro_settings_failed",
+                            icon = R.drawable.ic_sd_warning,
+                            title = "Camera: Settings Error",
+                            detail = "Failed: ${failed.joinToString(", ")}",
+                            autoDismissMs = 5000L,
+                            backgroundColor = R.color.alert_warning,
+                            textColor = R.color.white,
+                        ),
+                    )
+                }
             }
             .catch { e -> Timber.w(e, "Video settings applier error") }
             .launchIn(serviceScope)

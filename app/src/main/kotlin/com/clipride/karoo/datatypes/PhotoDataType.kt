@@ -28,6 +28,8 @@ import io.hammerhead.karooext.models.UpdateGraphicConfig
 import io.hammerhead.karooext.models.ViewConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -50,17 +52,26 @@ class PhotoDataType(
             // Render initial state
             try {
                 val result = glance.compose(context, DpSize.Unspecified) {
-                    PhotoView(bleManager.connectionState.value, photoIntent)
+                    PhotoView(
+                        bleManager.connectionState.value,
+                        bleManager.isRecording.value,
+                        photoIntent,
+                    )
                 }
                 emitter.updateView(result.remoteViews)
             } catch (e: Exception) {
                 Timber.w(e, "PhotoDataType: initial render failed")
             }
 
-            bleManager.connectionState.collect { state ->
+            combine(
+                bleManager.connectionState,
+                bleManager.isRecording,
+            ) { state, recording ->
+                Pair(state, recording)
+            }.conflate().collect { (state, recording) ->
                 try {
                     val result = glance.compose(context, DpSize.Unspecified) {
-                        PhotoView(state, photoIntent)
+                        PhotoView(state, recording, photoIntent)
                     }
                     emitter.updateView(result.remoteViews)
                 } catch (e: Exception) {
@@ -75,13 +86,18 @@ class PhotoDataType(
 @Composable
 private fun PhotoView(
     state: GoProConnectionState,
+    isRecording: Boolean,
     photoIntent: Intent,
 ) {
     DataFieldContainer {
+        val baseModifier = GlanceModifier.fillMaxSize()
+        val modifier = if (isRecording && state == GoProConnectionState.CONNECTED) {
+            baseModifier // No clickable — recording in progress
+        } else {
+            baseModifier.clickable(actionSendBroadcast(photoIntent))
+        }
         Column(
-            modifier = GlanceModifier
-                .fillMaxSize()
-                .clickable(actionSendBroadcast(photoIntent)),
+            modifier = modifier,
             verticalAlignment = Alignment.CenterVertically,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -91,10 +107,10 @@ private fun PhotoView(
                 ValueText(
                     text = "PHOTO",
                     fontSize = 28.sp,
-                    color = GlanceColors.BatteryGood,
+                    color = if (isRecording) GlanceColors.TextDim else GlanceColors.BatteryGood,
                 )
                 LabelText(
-                    text = "tap for photo",
+                    text = if (isRecording) "recording" else "tap for photo",
                     color = GlanceColors.TextDim,
                     fontSize = 11.sp,
                 )

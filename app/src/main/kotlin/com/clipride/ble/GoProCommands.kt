@@ -138,27 +138,33 @@ class GoProCommands @Inject constructor(
         fps: Int,
         fov: Int,
         hyperSmooth: Int,
-    ) {
+    ): List<String> {
+        val failed = mutableListOf<String>()
         if (resolution >= 0) {
             applySetting(GoProSetting.VIDEO_RESOLUTION, resolution).onFailure {
                 Timber.w("Failed to set resolution: ${it.message}")
+                failed.add("Resolution")
             }
         }
         if (fps >= 0) {
             applySetting(GoProSetting.FPS, fps).onFailure {
                 Timber.w("Failed to set FPS: ${it.message}")
+                failed.add("FPS")
             }
         }
         if (fov >= 0) {
             applySetting(GoProSetting.VIDEO_LENS, fov).onFailure {
                 Timber.w("Failed to set FOV: ${it.message}")
+                failed.add("FOV")
             }
         }
         if (hyperSmooth >= 0) {
             applySetting(GoProSetting.HYPERSMOOTH, hyperSmooth).onFailure {
                 Timber.w("Failed to set HyperSmooth: ${it.message}")
+                failed.add("HyperSmooth")
             }
         }
+        return failed
     }
 
     // --- Power ---

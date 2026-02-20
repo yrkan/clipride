@@ -10,7 +10,9 @@ import com.clipride.util.FeedbackHelper
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -54,6 +56,10 @@ class ClipRideActionReceiver : BroadcastReceiver() {
                 val pending = goAsync()
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
+                        if (bleManager.isRecording.value) {
+                            Timber.d("Mode switch blocked: recording in progress")
+                            return@launch
+                        }
                         val currentPreset = bleManager.currentPresetGroup.value
                         when (currentPreset) {
                             1000 -> commands.loadPhotoMode()   // Video → Photo
@@ -72,11 +78,21 @@ class ClipRideActionReceiver : BroadcastReceiver() {
                 val pending = goAsync()
                 CoroutineScope(Dispatchers.IO).launch {
                     try {
+                        if (bleManager.isRecording.value) {
+                            Timber.d("Quick photo blocked: recording in progress")
+                            return@launch
+                        }
                         // Switch to photo, capture, switch back to video
                         val wasPreset = bleManager.currentPresetGroup.value
                         if (wasPreset != 1001) {
                             commands.loadPhotoMode()
-                            kotlinx.coroutines.delay(500)
+                            val switched = withTimeoutOrNull(3000L) {
+                                bleManager.currentPresetGroup.first { it == 1001 }
+                            }
+                            if (switched == null) {
+                                Timber.w("Photo: mode switch timeout, aborting")
+                                return@launch
+                            }
                         }
                         commands.startRecording() // In photo mode, shutter = capture
                         kotlinx.coroutines.delay(500)

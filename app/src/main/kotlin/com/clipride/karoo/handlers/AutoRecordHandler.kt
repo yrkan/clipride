@@ -58,6 +58,11 @@ class AutoRecordHandler(
             Timber.d("AutoRecord: already recording, skipping")
             return
         }
+        val sdRemaining = bleManager.sdCardRemaining.value
+        if (sdRemaining != null && sdRemaining <= BatteryAlertHandler.SD_FULL_THRESHOLD_SEC) {
+            Timber.d("AutoRecord: SD card full, skipping")
+            return
+        }
 
         val delayMs = preferences.autoRecordDelaySeconds * 1000L
         startRecordingJob?.cancel()
@@ -87,6 +92,11 @@ class AutoRecordHandler(
         if (!preferences.autoRecordEnabled) return
         if (!preferences.continueOnAutoPause) return
         if (bleManager.isRecording.value) return
+        val sdRemaining = bleManager.sdCardRemaining.value
+        if (sdRemaining != null && sdRemaining <= BatteryAlertHandler.SD_FULL_THRESHOLD_SEC) {
+            Timber.d("AutoRecord: SD card full, skipping resume")
+            return
+        }
 
         scope.launch {
             val result = commands.startRecording()

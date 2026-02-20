@@ -1049,6 +1049,7 @@ class GoProBleManager @Inject constructor(
             GoProStatus.READY,
             GoProStatus.OVERHEATING,
             GoProStatus.COLD,
+            GoProStatus.ACTIVE_HILIGHTS,
         )
         val payload = byteArrayOf(0x13) + statusIds
         val maxLen = peripheral.maximumWriteValueLength(WriteType.WITHOUT_RESPONSE)
